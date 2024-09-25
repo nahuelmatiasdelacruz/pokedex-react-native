@@ -1,5 +1,5 @@
 import { View } from "react-native"
-import { Text } from "react-native-paper";
+import { FAB, Text, useTheme } from "react-native-paper";
 import { getPokemons } from "../../../actions/pokemons";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { PokeballBg } from "../../components/ui/PokeballBg";
@@ -8,10 +8,17 @@ import { FlatList } from "react-native-gesture-handler";
 import { globalStyles } from "../../styles/global.styles";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PokemonCard } from "../../components/pokemons/PokemonCard";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParams } from "../../navigator/StackNavigator";
+import { useContext } from "react";
+import { ThemeContext } from "../../context/ThemeContext";
 
-export const HomeScreen = () => {
+interface HomeScreenProps extends StackScreenProps<RootStackParams> {};
+
+export const HomeScreen = ({ navigation }:HomeScreenProps) => {
   const { top } = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const { theme } = useContext(ThemeContext);
   const { isLoading, data, fetchNextPage } = useInfiniteQuery({
     queryKey: ['pokemons','infinite'],
     initialPageParam: 0,
@@ -42,6 +49,15 @@ export const HomeScreen = () => {
         onEndReached={()=>fetchNextPage()}
         renderItem={({item})=><PokemonCard pokemon={item}/>}
         showsVerticalScrollIndicator={false}
+      />
+      <FAB
+        label='Buscar'
+        style={[globalStyles.fab,{
+          backgroundColor: theme.colors.primary
+        }]}
+        mode='elevated'
+        onPress={()=>navigation.push('SearchScreen')}
+        color={theme.dark ? 'black' : 'white'}
       />
     </View>
   );
